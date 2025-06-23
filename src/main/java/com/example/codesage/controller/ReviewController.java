@@ -1,14 +1,17 @@
 package com.example.codesage.controller;
 
+import com.example.codesage.service.DeepSeekService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller
+@RequiredArgsConstructor
 class ReviewController {
+    private final DeepSeekService deepSeekService;
 
     @GetMapping("/")
     public String showForm() {
@@ -21,10 +24,7 @@ class ReviewController {
         @RequestParam("pullRequestUrl") String pullRequestUrl,
         Model model) {
 
-        System.out.println("Code/Logs: " + codeAndLogs);
-        System.out.println("Pull Request URL: " + pullRequestUrl);
-
-        model.addAttribute("message", "Данные успешно отправлены!");
+        model.addAttribute("message", deepSeekService.chatCompletion(codeAndLogs));
         return "reviewForm";
     }
 }

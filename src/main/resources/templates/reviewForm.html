@@ -5,26 +5,54 @@
     <meta charset="UTF-8" />
     <style>
         body { font-family: Arial, sans-serif; margin: 2rem; }
-        textarea { width: 100%; height: 150px; }
-        input[type="text"] { width: 100%; padding: 0.5rem; }
+        textarea, input[type="text"] { width: 100%; padding: 0.5rem; margin-top: 0.5rem; }
         label { font-weight: bold; margin-top: 1rem; display: block; }
         button { margin-top: 1rem; padding: 0.5rem 1rem; }
         .message { margin-top: 1rem; color: green; font-weight: bold; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 <h1>AI-Powered Code & Log Assistant</h1>
 
 <form th:action="@{/submitReview}" method="post">
-    <label for="codeAndLogs">Введите логи и код для проверки:</label>
-    <textarea id="codeAndLogs" name="codeAndLogs" required></textarea>
+    <label>Выберите режим:</label>
+    <label><input type="radio" name="mode" value="logs" checked onchange="toggleInput()"> Ввести логи</label>
+    <label><input type="radio" name="mode" value="pr" onchange="toggleInput()"> Ввести ссылку на PR</label>
 
-    <label for="pullRequestUrl">Ссылка на Pull Request для ревью:</label>
-    <input type="text" id="pullRequestUrl" name="pullRequestUrl" placeholder="https://github.com/user/repo/pull/123" required />
+    <div id="logsSection">
+        <label for="codeAndLogs">Введите логи и код для проверки:</label>
+        <textarea id="codeAndLogs" name="codeAndLogs" required></textarea>
+    </div>
+
+    <div id="prSection" class="hidden">
+        <label for="pullRequestUrl">Ссылка на Pull Request для ревью:</label>
+        <input type="text" id="pullRequestUrl" name="pullRequestUrl" placeholder="https://github.com/user/repo/pull/123" />
+    </div>
 
     <button type="submit">Отправить</button>
 </form>
 
 <div th:if="${message}" class="message" th:text="${message}"></div>
+
+<script>
+    function toggleInput() {
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const logsSection = document.getElementById('logsSection');
+        const prSection = document.getElementById('prSection');
+
+        if (mode === 'logs') {
+            logsSection.classList.remove('hidden');
+            prSection.classList.add('hidden');
+            document.getElementById('codeAndLogs').setAttribute('required', 'required');
+            document.getElementById('pullRequestUrl').removeAttribute('required');
+        } else {
+            prSection.classList.remove('hidden');
+            logsSection.classList.add('hidden');
+            document.getElementById('pullRequestUrl').setAttribute('required', 'required');
+            document.getElementById('codeAndLogs').removeAttribute('required');
+        }
+    }
+</script>
 </body>
 </html>
