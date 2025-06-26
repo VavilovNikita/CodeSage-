@@ -1,5 +1,10 @@
 package com.example.codesage.api;
 
+import com.example.codesage.model.Recommendation;
+import com.example.codesage.model.RecommendationResponse;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -10,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class DeepSeekApi {
@@ -19,10 +27,12 @@ public class DeepSeekApi {
 
     public DeepSeekApi(@Value("${deepseek.api.key}") String apiKey) {
         this.apiKey = apiKey;
-        this.client = new OkHttpClient();
+        this.client = new OkHttpClient.Builder()
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build();
     }
 
-    public String chatCompletion(JSONObject requestBody) {
+    public RecommendationResponse chatCompletion(JSONObject requestBody) {
         try {
             return post("/chat/completions", requestBody);
         } catch (IOException e) {
@@ -30,7 +40,7 @@ public class DeepSeekApi {
         }
     }
 
-    private String post(String endpoint, JSONObject jsonBody) throws IOException {
+    private RecommendationResponse post(String endpoint, JSONObject jsonBody) throws IOException {
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
 
@@ -49,12 +59,30 @@ public class DeepSeekApi {
 
             JSONObject jsonResponse = new JSONObject(responseBody);
 
-            return jsonResponse
+            return parseRecommendationResponse(jsonResponse
                 .getJSONArray("choices")
                 .getJSONObject(0)
                 .getJSONObject("message")
-                .getString("content");
+                .getString("content").toString());
         }
     }
+    public RecommendationResponse parseRecommendationResponse(String rawContent) throws IOException {
+        String cleaned = rawContent.replaceAll("(?s)```json\\s*|\\s*```", "").trim();
+        int start = cleaned.indexOf('{');
+        int end = cleaned.lastIndexOf('}');
+        if (start == -1 || end == -1 || end < start) {
+            throw new IOException("Некорректный JSON-формат в ответе ассистента");
+        }
+        String jsonOnly = cleaned.substring(start, end + 1);
 
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(cleaned, RecommendationResponse.class);
+        } catch (MismatchedInputException e) {
+            Recommendation rec = mapper.readValue(cleaned, Recommendation.class);
+            RecommendationResponse response = new RecommendationResponse();
+            response.setRecommendations(Collections.singletonList(rec));
+            return response;
+        }
+    }
 }

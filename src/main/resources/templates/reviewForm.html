@@ -33,7 +33,10 @@
     <button type="submit">Отправить</button>
 </form>
 
-<div th:if="${message}" class="message" th:text="${message}"></div>
+<div th:if="${message}">
+    <pre th:text="${message}"></pre>
+</div>
+
 
 <script>
     function toggleInput() {
