@@ -2,7 +2,6 @@ package com.example.codesage.api;
 
 import com.example.codesage.model.Recommendation;
 import com.example.codesage.model.RecommendationResponse;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import okhttp3.MediaType;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component

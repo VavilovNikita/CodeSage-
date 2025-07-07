@@ -2,6 +2,9 @@ package com.example.codesage.service;
 
 import com.example.codesage.api.DeepSeekApi;
 import com.example.codesage.model.RecommendationResponse;
+import com.example.codesage.model.RequestedData;
+import com.example.codesage.repository.RequestRepositories;
+import com.example.codesage.repository.ResponseRepositories;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Service;
 public class DeepSeekService {
 
     private final DeepSeekApi deepSeekApi;
+    private final ResponseRepositories responseRepositories;
+    private final RequestRepositories requestRepositories;
 
     @Value("${deepseek.model}")
     private String model;
@@ -33,8 +38,15 @@ public class DeepSeekService {
     @Value("${deepseek.system.example}")
     private String example;
 
-    public String chatCompletion(String messages) {
-        return deepSeekApi.chatCompletion(createRequestWithContent(messages)).toString();
+    public String chatCompletionString(String messages) {
+        RecommendationResponse response = deepSeekApi.chatCompletion(createRequestWithContent(messages));
+        response.setRequest(requestRepositories.save(new RequestedData().setRequestedData(messages)));
+        responseRepositories.saveAll(response.getRecommendations());
+        return response.toString();
+    }
+
+    public RecommendationResponse chatCompletion(String messages) {
+        return deepSeekApi.chatCompletion(createRequestWithContent(messages));
     }
 
     public JSONObject createRequestWithContent(String userContent) {

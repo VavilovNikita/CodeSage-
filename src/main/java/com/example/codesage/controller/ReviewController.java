@@ -24,7 +24,7 @@ class ReviewController {
         @RequestParam("pullRequestUrl") String pullRequestUrl,
         Model model) {
 
-        model.addAttribute("message", deepSeekService.chatCompletion(codeAndLogs));
+        model.addAttribute("message", deepSeekService.chatCompletionString(codeAndLogs));
         return "reviewForm";
     }
 }

@@ -40,4 +40,10 @@ public class RecommendationResponse {
 
         return sb.toString().trim();
     }
+
+    public void setRequest(RequestedData messages) {
+        for (Recommendation recommendation : getRecommendations()) {
+            recommendation.setRequestedData(messages);
+        }
+    }
 }
