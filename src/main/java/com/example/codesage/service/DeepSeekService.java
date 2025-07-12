@@ -79,4 +79,30 @@ public class DeepSeekService {
         }
         return request;
     }
+
+    public JSONObject ccreateRequestWithContent(String userContent, InputMode mode) {
+        JSONObject request = new JSONObject();
+        try {
+            request.put("model", model);
+            request.put("stream", stream);
+
+            JSONArray messages = new JSONArray();
+
+            JSONObject systemMessage = new JSONObject();
+            systemMessage.put("role", systemRole);
+            systemMessage.put("content", youAnalysisAssistant + mode.getName() + systemContent);
+
+            JSONObject userMessage = new JSONObject();
+            userMessage.put("role", userRole);
+            userMessage.put("content", userContent + " " + example);
+
+            messages.put(systemMessage);
+            messages.put(userMessage);
+
+            request.put("messages", messages);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return request;
+    }
 }
