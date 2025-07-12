@@ -40,6 +40,7 @@ deepseek:
     example: >
       Вот пример того, как выглядит правильный ответ:
       {"recommendations":[{"issue":"...", "description":"...", "suggestion":"...", "example":"...", "note":"..."}]}
+      на русском
     You-analysis-assistant: Ты ассистент по анализу
 
   user:

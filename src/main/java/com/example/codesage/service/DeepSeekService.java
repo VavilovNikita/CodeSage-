@@ -20,6 +20,7 @@ public class DeepSeekService {
     private final DeepSeekApi deepSeekApi;
     private final ResponseRepositories responseRepositories;
     private final RequestRepositories requestRepositories;
+    private final GitHubPullRequestService gitHubPullRequestService;
 
     @Value("${deepseek.model}")
     private String model;
@@ -43,6 +44,7 @@ public class DeepSeekService {
     private String youAnalysisAssistant;
 
     public String chatCompletionString(String messages, InputMode mode) {
+        messages = getContent(messages, mode);
         RecommendationResponse response = deepSeekApi.chatCompletion(createRequestWithContent(messages, mode));
         response.setRequest(requestRepositories.save(new RequestedData().setRequestedData(messages)));
         responseRepositories.saveAll(response.getRecommendations());
@@ -78,5 +80,12 @@ public class DeepSeekService {
             throw new RuntimeException(e);
         }
         return request;
+    }
+
+    private String getContent(String userContent, InputMode mode) {
+        return switch (mode) {
+            case LOGS, CODE -> userContent;
+            case PR -> gitHubPullRequestService.getCodeFromPullRequest(userContent);
+        };
     }
 }

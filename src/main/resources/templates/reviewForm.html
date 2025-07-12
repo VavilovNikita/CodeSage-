@@ -10,9 +10,22 @@
         button { margin-top: 1rem; padding: 0.5rem 1rem; }
         .message { margin-top: 1rem; color: green; font-weight: bold; }
         .hidden { display: none; }
+        .nav { margin-bottom: 2rem; }
+        .nav a {
+            margin-right: 2rem;
+            text-decoration: none;
+            font-weight: bold;
+            color: #333;
+        }
     </style>
 </head>
 <body>
+
+<div class="nav">
+    <a href="/" th:href="@{/}">Главная</a>
+    <a href="/reviewHistory" th:href="@{/reviewHistory}">История запросов</a>
+</div>
+
 <h1>AI-Powered Code & Log Assistant</h1>
 
 <form th:action="@{/submitReview}" method="post">
@@ -70,6 +83,9 @@
             document.getElementById('codeInput').setAttribute('required', 'required');
         }
     }
+
+    // trigger toggle once on load
+    toggleInput();
 </script>
 </body>
 </html>
