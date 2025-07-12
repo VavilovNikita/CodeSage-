@@ -1,12 +1,11 @@
 package com.example.codesage.controller;
 
+import com.example.codesage.model.InputMode;
 import com.example.codesage.service.DeepSeekService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,11 +19,11 @@ class ReviewController {
 
     @PostMapping("/submitReview")
     public String submitReview(
-        @RequestParam("codeAndLogs") String codeAndLogs,
-        @RequestParam("pullRequestUrl") String pullRequestUrl,
-        Model model) {
+        @RequestParam("mode") InputMode mode,
+        @RequestParam(value = "inputText", required = false) String inputText, Model model) {
 
-        model.addAttribute("message", deepSeekService.chatCompletionString(codeAndLogs));
+        String response = deepSeekService.chatCompletionString(inputText, mode);
+        model.addAttribute("message", response);
         return "reviewForm";
     }
 }

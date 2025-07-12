@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: CodeSage
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/codeSage
+    username: codeSage
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+  security:
+    user:
+      name: user
+      password: root
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+
+  config:
+    import: optional:file:./application-secrets.properties
+
+deepseek:
+  model: deepseek-chat
+  stream: false
+
+  system:
+    role: system
+    content: >
+      Пожалуйста, возвращай JSON-массив в поле "recommendations".
+      Каждая рекомендация должна содержать: issue, description, suggestion, example, note.
+      Не используй markdown, просто JSON.
+      Пример: {"recommendations":[{"issue":"...", "description":"...", "suggestion":"...", "example":"...", "note":"..."}]}
+    example: >
+      Вот пример того, как выглядит правильный ответ:
+      {"recommendations":[{"issue":"...", "description":"...", "suggestion":"...", "example":"...", "note":"..."}]}
+    You-analysis-assistant: Ты ассистент по анализу
+
+  user:
+    role: user

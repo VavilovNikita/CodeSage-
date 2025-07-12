@@ -1,6 +1,7 @@
 package com.example.codesage.service;
 
 import com.example.codesage.api.DeepSeekApi;
+import com.example.codesage.model.InputMode;
 import com.example.codesage.model.RecommendationResponse;
 import com.example.codesage.model.RequestedData;
 import com.example.codesage.repository.RequestRepositories;
@@ -38,18 +39,22 @@ public class DeepSeekService {
     @Value("${deepseek.system.example}")
     private String example;
 
-    public String chatCompletionString(String messages) {
-        RecommendationResponse response = deepSeekApi.chatCompletion(createRequestWithContent(messages));
+    @Value("${deepseek.system.You-analysis-assistant}")
+    private String youAnalysisAssistant;
+
+    public String chatCompletionString(String messages, InputMode mode) {
+        RecommendationResponse response = deepSeekApi.chatCompletion(createRequestWithContent(messages, mode));
         response.setRequest(requestRepositories.save(new RequestedData().setRequestedData(messages)));
         responseRepositories.saveAll(response.getRecommendations());
         return response.toString();
     }
 
     public RecommendationResponse chatCompletion(String messages) {
-        return deepSeekApi.chatCompletion(createRequestWithContent(messages));
+        requestRepositories.save(new RequestedData().setRequestedData(messages));
+        return deepSeekApi.chatCompletion(createRequestWithContent(messages, InputMode.LOGS));
     }
 
-    public JSONObject createRequestWithContent(String userContent) {
+    public JSONObject createRequestWithContent(String userContent, InputMode mode) {
         JSONObject request = new JSONObject();
         try {
             request.put("model", model);
@@ -59,7 +64,7 @@ public class DeepSeekService {
 
             JSONObject systemMessage = new JSONObject();
             systemMessage.put("role", systemRole);
-            systemMessage.put("content", systemContent);
+            systemMessage.put("content", youAnalysisAssistant + mode.getName() + systemContent);
 
             JSONObject userMessage = new JSONObject();
             userMessage.put("role", userRole);
